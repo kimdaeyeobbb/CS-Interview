@@ -12,7 +12,39 @@
 
 ## 일반함수
 
+- 사용예시 (reduce)
+```js
+const arr1 = [1,2,3,4,5];
 
+function basicFunc(accumulator, currentValue, currentIndex, array){
+    console.log("acc: "+accumulator+", cur: "+currentValue
+        +", currentIndex: "+currentIndex+", array: "+array);
+    return accumulator + currentValue;
+}
+
+const initialValue = 0;
+const sumOfNum = arr1.reduce(basicFunc, initialValue);
+
+console.log(sumOfNum); // 0+1+2+3+4+5 = 15
+```
+
+
+
+
+## 화살표 함수
+
+- 사용예시 (reduce)
+```js
+const arr1 = [1,2,3,4,5];
+
+const initialValue = 0;
+const sumOfNum = arr1.reduce(
+    (previousValue, currentValue) =>
+        previousValue+currentValue, initialValue
+);
+
+console.log(sumOfNum); // 0+1+2+3+4+5 = 15
+```
 
 
 <br><br>

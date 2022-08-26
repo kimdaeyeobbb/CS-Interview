@@ -228,3 +228,142 @@ setState({...person, name: 'pyo'});
   4. useEffect()가 실행됩니다.
 - 조건부 수행
   - 변경 혹은 컴포넌트의 소멸이 발생 시 useEffect() 실행
+### 리액트의 생명주기
+1. Mounting 컴포넌트 내부
+  - 컴포넌트가 호출이 되었을 때 가장 먼저 호출이 되는 것은 컴포넌트 내부입니다.
+```jsx
+/**
+ * 함수형 컴포넌트 예시 
+ */
+const LifecycleFunctionComponent: React.FC = (props: any) => {
+
+    /**
+     * 컴포넌트 호출 시 가장 먼저 호출이 되는 공간
+     * 컴포넌트에서 사용 될 state나 함수들을 정의 하는 공간입니다.
+     */
+    console.log("해당 부분이 제일 먼저 호출이 됩니다.");
+
+    const [userInfo, setUserInfo] = useState<any>({
+        userId: 'adjh54',
+        userAge: 50,
+        isShowTempComponent: false,
+    });
+
+    return (
+        <></>
+    )
+
+};
+export default LifecycleFunctionComponent;
+```
+2. Mounting return()
+  - 미리 구현한 HTML를 화면상에 보여주는 메서드입니다.
+3. [Mounting / Updating/ UnMounting] useEffect()
+  - 해당 메서드를 통해 Mounting/Updating/UnMounting 처리가 가능합니다.
+  - 하나의 컴포넌트 내에서 여러 개 선언이 가능하며, 하나의 메서드로 처리를 해도 무방합니다.
+### deps
+- deps의 값에 값이 없을 경우 = 화면이 렌더링 된 이후 수행이 되며, 리 렌더링이 발생하는 경우 다시 수행됩니다.
+- deps의 값이 빈배열인 경우 = 화면이 렌더링 된 이후에만 수행이 됩니다.
+- 배열 값이 존재하는 경우 = 화면이 렌더링 된 이후에 수행이 되고, 값이 변경되었을 경우 해당 메서드가 수행이됩니다.
+### [Mounting] useEffect()
+- 컴포넌트 내에서 렌더링이 수행된 이후에 실행이 되는 메서드입니다.
+### [Updating] useEffect()
+- 컴포넌트 내에서 변화가 발생하였을 경우에 실행되는 메서드입니다.
+### 참고
+- [티스토리](https://adjh54.tistory.com/43)
+### 요약
+- useEffect : React hook에서 라이프사이클 구현에 사용되는 함수
+```jsx
+useEffect(() => {
+  // 실행할 함수
+})
+```
+두번 째 파라미터를 주지 않으면 모든 컴포넌트가 리렌더링 될 때마다 실행(메모리 과다 사용)
+- componentDidMount() : 렌더링이 완료된 후 호출되는 메서드
+```jsx
+useEffect(() => {
+  // 실행할 함수
+}.[])
+```
+마운트 이후 한 번만 실행
+- componentDidUpdate() & getDerviedStateFromProps() : 컴포넌트 업데이트 작업 완료 후 실행되는 메소드
+```jsx
+useEffect(() => {
+	// 실행할 함수
+}, [props명, state명, ...])
+```
+두번 째 파라미터 배열에 명시한 변수가 변경될 때만 실행
+- componentWillUnmount : 컴포넌트가 DOM에서 제거될 때 호출되는 메소드
+```jsx
+useEffect(() => {
+	// 실행할 함수
+    
+    return () => {
+    	// unmount나 unsubscribe 함수
+    }
+}, [props명, state명, ...])
+
+```
+effect가 필요없어지면 return 함수 실행하여 메모리 반환
+
+### 참고
+- [티스토리](https://guiyomi.tistory.com/21)
+---
+# Context
+- context를 이용하면 단계마다 일일히 props를 넘겨주지 않고도 컴포넌트 트리 전체에 데이터를
+제공할 수 있습니다.
+```jsx
+function UserList({ users, onRemove, onToggle }) {
+  return (
+    <div>
+      {users.map(user => (
+        <User
+          user={user}
+          key={user.id}
+          onRemove={onRemove}
+          onToggle={onToggle}
+        />
+      ))}
+    </div>
+  );
+}
+```
+위의 코드를 보면 상위 컴포넌트에서 onToggle, onRemove가 구현되어있고
+이 함수들은 UserList를 거쳐서 User 컴포넌트에 전달 되고 있습니다.
+UserList 컴포넌트의 경우에는 onToggle과 onRemove를 전달하기 위하여 중간 다리역할만 하고 있습니다.
+위와 같이 컴포넌트 한개정도를 거쳐서 전달하는건 불편하지 않지만
+만약 3~4개 이상의 컴포넌트를 거쳐서 전달해야하는 일이 발생한다면
+이는 매우 번거로운 일이 됩니다. (propsDrilling);
+
+### 사용법
+- React.createContext
+  - 컨텍스트 객체를 만듭니다. 컴포넌트가 이 컨텍스트를 가지려면 해당 컴포넌트 상위에
+  프로바이더로부터 컨텍스트를 정의한 변수 myStore를 감싸면 됩니다.
+  - defaultValue param은 트리 안에 적절한 provider를 찾지 못했을 때 쓰이는 값입니다.
+
+```jsx
+const MyStore = React.createContext(defaultValue);
+```
+
+- Context.Provider
+  - 프로바이더는 정의한 context를 하위 컴포넌트에게 전달하는 역할을 합니다.
+  - 프로바이더를 전달하는 변수는 꼭 value를 사용해야합니다.
+  - 전달 받는 컴포넌트의 제한수는 없습니다.
+  - 프로바이더에 하위 프로바이더 배치 가능하며, 그럴 경우 하위 프로바이더 값이 우선시됩니다.
+  - 프로바이더 하위에 컨텍스트를 가진 컴포넌트는 프로바이더의 value로 가진 스테이트가 변화할 때마다
+  리렌더링됩니다.
+```jsx
+<MyStore.Provider value={this.state}>
+  <subComponent1 />
+  <subComponent2 />
+</MyStore.Provider>
+```
+- Context.Consumer
+  - context 변화를 구독하는 컴포넌트입니다.
+  - context의 자식은 함수(컴포넌트)여야합니다.
+  - 이 함수(컴포넌트)가 가지는 cotext값은 가장 가까운 프로바이더의 값입니다.
+  - 상위 프로바이더가 없다면 createContext() 에서 정의한 defaultValue를 가집니다.
+### 참고
+- [티스토리](https://kyounghwan01.github.io/blog/React/react-context-api/#api)
+- [벨로퍼트님](https://react.vlpt.us/basic/22-context-dispatch.html)
+- [공식문서](https://ko.reactjs.org/docs/context.html)
